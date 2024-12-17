@@ -465,7 +465,7 @@ cv::cuda::Stream::Stream(const size_t cudaFlags)
     CV_UNUSED(cudaFlags);
     throw_no_cuda();
 #else
-    impl_ = makePtr<Impl>(cudaFlags & UINT_MAX);
+    impl_ = makePtr<Impl>((const unsigned int)(cudaFlags & UINT_MAX));
 #endif
 }
 
