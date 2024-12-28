@@ -107,7 +107,18 @@ struct CharucoDetector::CharucoDetectorImpl {
                     Point2f markerCorner =
                         markerCorners.getMat(markerIdx).at<Point2f>(board.getNearestMarkerCorners()[i][j]);
                     Point2f charucoCorner = charucoCorners.getMat().at<Point2f>((int)i);
-                    double dist = norm(markerCorner - charucoCorner);
+                    // norm() calculates diagonal distance while cornerSubpix() uses distance along axes.
+                    // Thus by using norm(), we overestimate window size by up to sqrt(2) 
+                    // which leads to inclusion of marker pixels into the window
+                    // which leads to poor performance
+                    // 
+                    // Use orthogonal distances instead:
+                    double dx = abs(markerCorner.x - charucoCorner.x);
+                    double dy = abs(markerCorner.y - charucoCorner.y);
+                    // max() because of the geometry of charuco board
+                    double dist = max(dx, dy);
+                    //double dist = norm(markerCorner - charucoCorner);
+
                     if(minDist == -1) minDist = dist; // if first distance, just assign it
                     minDist = min(dist, minDist);
                     counter++;
